@@ -3,53 +3,26 @@ import styled from "styled-components/native";
 import colors from "../colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import InputScrollView from "react-native-input-scroll-view";
+import {
+  Container,
+  Emotion,
+  FlexRow_AlignCenter,
+  Title,
+} from "../journalsStyles";
 
-const Container = styled.View`
-  flex: 1;
-  padding: 2% 5%;
-`;
-
-const DateTitle = styled.Text`
-  margin-top: 15%
-  text-align: center;
-  font-size: 28px;
-  font-weight: 500;
-`;
-
-const Emotions = styled.View`
-  flex-direction: row;
+const Emotions = styled(FlexRow_AlignCenter)`
   margin: 10% 0;
-  align-items: center;
 `;
 
-const Emotion = styled.TouchableOpacity`
-  background-color: ${colors.lightPinkColor};
-  elevation: 3;
-  padding: 10px;
-  border-radius: 10px;
-`;
-
-const Title = styled.View`
-margin-top: 10px
-  margin-left: 15px;
+const Text_box = styled.View`
+margin-top: ${(props) => props.marginTop}
   background-color: white;
   border-radius: 20px;
-  padding-vertical: 2%;
-  padding-horizontal: 2%;
-  width: 300px;
+  padding-vertical: ${(props) => props.padding}
+  padding-horizontal: ${(props) => props.padding}
 `;
 const TitleText = styled.Text`
   font-size: 24px;
-`;
-
-const SubtitleBox = styled.View`
-margin-top: 20px
-  background-color: white;
-  border-radius: 20px;
-  padding-vertical: 4%;
-  padding-horizontal: 4%;
-  height: 500px
-
 `;
 
 const Subtitle = styled.Text``;
@@ -57,7 +30,7 @@ const Subtitle = styled.Text``;
 export default function DetailJournal({ route: { params } }) {
   return (
     <Container>
-      <DateTitle>{`${params.year}년 ${params.month}월 ${params.day}일`}</DateTitle>
+      <Title>{`${params.year}년 ${params.month}월 ${params.day}일`}</Title>
       <Emotions>
         <Emotion>
           <MaterialCommunityIcons
@@ -66,14 +39,18 @@ export default function DetailJournal({ route: { params } }) {
             color={colors.redColor}
           />
         </Emotion>
-        <Title>
+        <Text_box
+          marginTop="10px"
+          padding="2%"
+          style={{ marginLeft: 15, width: 300 }}
+        >
           <TitleText>{params.diary}</TitleText>
-        </Title>
+        </Text_box>
       </Emotions>
       <InputScrollView>
-        <SubtitleBox>
+        <Text_box marginTop="20px" padding="4%" style={{ height: 500 }}>
           <Subtitle>{params.sub}</Subtitle>
-        </SubtitleBox>
+        </Text_box>
       </InputScrollView>
     </Container>
   );

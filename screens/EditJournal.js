@@ -4,70 +4,16 @@ import colors from "../colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import InputScrollView from "react-native-input-scroll-view";
 import { DBContext } from "../context";
-
-const Container = styled.View`
-  flex: 1;
-  padding: 2% 5%;
-`;
-
-const Title = styled.Text`
-  margin-top: 15% 
-  text-align: center;
-  font-size: 28px;
-  font-weight: 500;
-`;
-
-const Emotions = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  margin: 10% 0;
-`;
-
-const Emotion = styled.TouchableOpacity`
-  background-color: ${colors.lightPinkColor};
-  elevation: 3;
-  padding: 10px;
-  border-radius: 10px;
-`;
-
-const TitleInput = styled.TextInput`
-  background-color: white;
-  border-radius: 20px;
-  padding-vertical: 4%;
-  padding-horizontal: 4%;
-  font-size: 18px;
-`;
-
-const Input = styled.TextInput`
-margin-top: 30px
-  background-color: white;
-  border-radius: 20px;
-  padding-vertical: 4%;
-  padding-horizontal: 4%;
-
-`;
-
-const Btn = styled.TouchableOpacity`
-  background-color: ${colors.redColor};
-  padding-vertical: 4%;
-  align-items: center;
-  border-radius: 20px;
-  margin: 5% 0;
-`;
-const BtnText = styled.Text`
-  color: white;
-  font-weight: 500;
-  font-size: 18px;
-`;
-
-const emotions = [
-  "emoticon-kiss-outline",
-  "emoticon-lol-outline",
-  "emoticon-excited-outline",
-  "emoticon-tongue-outline",
-  "emoticon-cool-outline",
-  "emoticon-wink-outline",
-];
+import emotions from "../emotions";
+import {
+  Btn,
+  BtnText,
+  Container,
+  Emotion,
+  Emotions,
+  Input,
+  Title,
+} from "../journalsStyles";
 
 export default function EditJournal({
   navigation: { goBack },
@@ -117,14 +63,19 @@ export default function EditJournal({
         ))}
       </Emotions>
       <InputScrollView>
-        <TitleInput placeholder="제목" onChangeText={onChangeText}>
+        <Input
+          placeholder="제목"
+          onChangeText={onChangeText}
+          style={{ fontSize: 18 }}
+        >
           {title}
-        </TitleInput>
+        </Input>
         <Input
           placeholder="내용"
           value={subtitle}
           onChangeText={onChangeSubText}
           multiline
+          style={{ marginTop: 30 }}
         ></Input>
         <Btn onPress={onSubmit}>
           <BtnText>저장</BtnText>

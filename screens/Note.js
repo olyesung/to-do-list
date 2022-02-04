@@ -6,10 +6,16 @@ import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { DBContext } from "../context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { FlexRow_AlignCenter } from "../journalsStyles";
 
 const Container = styled.View`
   flex:1
   background-color: white;
+`;
+
+const Center = styled.View`
+  align-items: center;
+  justify-content: center;
 `;
 
 const Header = styled.View`
@@ -34,47 +40,26 @@ const Input = styled.TextInput`
   border: 2px solid ${colors.darkBlueColor};
 `;
 
-const ToDo = styled.View`
+const ToDo = styled(FlexRow_AlignCenter)`
   margin: 2% 5%;
   border-radius: 20px;
-  flex-direction: row;
   justify-content: space-between;
-  align-items: center;
-`;
-
-const ToDo_box = styled.View`
-  flex-direction: row;
-  align-items: center;
 `;
 
 const ToDo_check_box = styled.TouchableOpacity`
   margin-right: 20px;
 `;
 
-const Check_color_box = styled.View`
+const Color_box = styled(Center)`
   background-color:${colors.lightPinkColor}
-  width: 40px;
-  height:40px
+  width: ${(props) => props.pixel}
+  height: ${(props) => props.pixel}
   border-radius: 12px;
-  align-items: center;
-  justify-content: center
 `;
 
-const Emotion_box = styled.View`
-background-color:${colors.lightPinkColor}
-width: 50px;
-height:50px
-border-radius: 13px;
-align-items: center;
-justify-content: center
-margin-right: 13px
-`;
-
-const Check_box = styled.View`
+const Check_box = styled(Center)`
   width: 40px;
-  height:40px
-  align-items: center;
-  justify-content: center
+  height: 40px;
 `;
 
 const ToDo_text = styled.Text`
@@ -91,21 +76,15 @@ width: 250px
   padding-vertical: 5px
 `;
 
-const Journal = styled.View`
+const Journal = styled(FlexRow_AlignCenter)`
   margin: 2% 5%;
   border-radius: 20px;
-  flex-direction: row;
-  align-items: center;
-
   justify-content: space-between;
-`;
-const Journal_box = styled.View`
-  flex-direction: row;
-  align-items: center;
 `;
 
 const Journal_text_box = styled.TouchableOpacity`
   width: 250px;
+  margin-left: 13px;
 `;
 
 const Journal_date = styled.Text`
@@ -325,16 +304,16 @@ export default function Note({ navigation: { navigate } }) {
           {Object.keys(toDos).map((key) =>
             toDos[key].todolist === todolist ? (
               <ToDo key={key}>
-                <ToDo_box>
+                <FlexRow_AlignCenter>
                   <ToDo_check_box onPress={() => isChecked(key)}>
                     {toDos[key].check ? (
-                      <Check_color_box>
+                      <Color_box pixel="40px">
                         <Ionicons
                           name="checkmark-sharp"
                           size={20}
                           color={colors.redColor}
                         />
-                      </Check_color_box>
+                      </Color_box>
                     ) : (
                       <Check_box>
                         <Ionicons
@@ -358,7 +337,7 @@ export default function Note({ navigation: { navigate } }) {
                       placeholder="입력하기"
                     ></ToDo_input>
                   )}
-                </ToDo_box>
+                </FlexRow_AlignCenter>
                 <TouchableOpacity
                   onLongPress={() => deleteToDo(key)}
                   activeOpacity={0.6}
@@ -375,14 +354,14 @@ export default function Note({ navigation: { navigate } }) {
           {Object.keys(diaries).map((key) =>
             diaries[key].todolist === todolist ? (
               <Journal key={key}>
-                <Journal_box>
-                  <Emotion_box>
+                <FlexRow_AlignCenter>
+                  <Color_box pixel="50px">
                     <MaterialCommunityIcons
                       name={diaries[key].selectedEmotion}
                       size={24}
                       color={colors.redColor}
                     />
-                  </Emotion_box>
+                  </Color_box>
                   <Journal_text_box
                     onPress={() =>
                       navigate("DetailJournal", { ...diaries[key] })
@@ -391,7 +370,7 @@ export default function Note({ navigation: { navigate } }) {
                     <Journal_date>{`${diaries[key].year}-${diaries[key].month}-${diaries[key].day}`}</Journal_date>
                     <Journal_text>{diaries[key].diary}</Journal_text>
                   </Journal_text_box>
-                </Journal_box>
+                </FlexRow_AlignCenter>
                 <TouchableOpacity
                   onLongPress={() => deleteJournal(key)}
                   activeOpacity={0.6}
