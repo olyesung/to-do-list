@@ -1,6 +1,8 @@
 import styled from "styled-components/native";
 import colors from "./colors";
 
+// Jounal, EditJournal, DetailJouranl에서 사용되는 styled-components
+
 export const Container = styled.View`
   flex: 1;
   padding: 2% 5%;

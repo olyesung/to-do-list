@@ -1,9 +1,9 @@
-import React, { useContext, useState } from "react";
-import styled from "styled-components/native";
+import React, { useState } from "react";
 import colors from "../colors";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import InputScrollView from "react-native-input-scroll-view";
-import { DBContext } from "../context";
+import { Alert } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { DBContext, useDB } from "../context";
 import emotions from "../emotions";
 import {
   Btn,
@@ -15,40 +15,45 @@ import {
   Title,
 } from "../journalsStyles";
 
-export default function EditJournal({
-  navigation: { goBack },
-  route: {
-    params: { diaryInfo, key },
-  },
-}) {
-  const { contextDB, setContextDB } = useContext(DBContext);
-  const [selectedEmotion, setEmotion] = useState(diaryInfo.selectedEmotion);
-  const [title, setTitle] = useState(diaryInfo.diary);
-  const [subtitle, setSubTitle] = useState(diaryInfo.sub);
-  const onChangeText = (text) => setTitle(text);
-  const onChangeSubText = (text) => setSubTitle(text);
+export default function AddJournal({ navigation: { goBack } }) {
+  const { contextDB, setContextDB } = useDB(DBContext);
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth() + 1;
+  const day = today.getDate();
+
+  const [selectedEmotion, setEmotion] = useState(null);
+  const [diary, setDiary] = useState("");
+  const [sub, setSub] = useState("");
+
+  const onChangeText = (text) => setDiary(text);
+  const onChangeSubText = (text) => setSub(text);
   const onEmotionPress = (face) => setEmotion(face);
 
+  // 일기탭 Input에서 받은 데이터를 contextDB에 넘겨줌
   const onSubmit = () => {
-    if (title === "" || selectedEmotion == null) {
+    if (diary === "" || selectedEmotion == null) {
       return Alert.alert("이모티콘 선택 또는 제목을 채워주세요.");
     }
-    const editJournal = {
-      [key]: {
-        ...diaryInfo,
+    const newJournal = {
+      [Date.now()]: {
+        diary,
         selectedEmotion,
-        sub: subtitle,
-        diary: title,
-        edit: true,
+        todolist: false,
+        year,
+        month,
+        day,
+        sub,
+        edit: false,
       },
     };
-    setContextDB(editJournal);
+    setContextDB(newJournal);
     goBack();
   };
 
   return (
     <Container>
-      <Title>{`${diaryInfo.year}년 ${diaryInfo.month}월 ${diaryInfo.day}일`}</Title>
+      <Title>{`${year}년 ${month}월 ${day}일`}</Title>
       <Emotions>
         {emotions.map((emotion, index) => (
           <Emotion key={index} onPress={() => onEmotionPress(emotion)}>
@@ -65,18 +70,17 @@ export default function EditJournal({
       <InputScrollView>
         <Input
           placeholder="제목"
+          value={diary}
           onChangeText={onChangeText}
           style={{ fontSize: 18 }}
-        >
-          {title}
-        </Input>
+        />
         <Input
           placeholder="내용"
-          value={subtitle}
+          value={sub}
           onChangeText={onChangeSubText}
           multiline
           style={{ marginTop: 30 }}
-        ></Input>
+        />
         <Btn onPress={onSubmit}>
           <BtnText>저장</BtnText>
         </Btn>

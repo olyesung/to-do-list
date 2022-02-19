@@ -6,10 +6,10 @@ import { Ionicons } from "@expo/vector-icons";
 import colors from "./colors";
 import Note from "./screens/Note";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import Journal from "./screens/Journal";
+import AddJournal from "./components/AddJournal";
 import { DBContext } from "./context";
-import EditJournal from "./screens/EditJournal";
-import DetailJournal from "./screens/DetailJournal";
+import EditJournal from "./components/EditJournal";
+import DetailJournal from "./components/DetailJournal";
 import Game from "./screens/Game";
 
 const Tabs = createBottomTabNavigator();
@@ -54,7 +54,7 @@ export default function Navigator() {
           <DBContext.Provider value={{ contextDB, setContextDB }}>
             <Stacks.Navigator screenOptions={{ headerShown: false }}>
               <Stacks.Screen name="Note" component={Note} />
-              <Stacks.Screen name="Journal" component={Journal} />
+              <Stacks.Screen name="Journal" component={AddJournal} />
               <Stacks.Screen name="EditJournal" component={EditJournal} />
               <Stacks.Screen name="DetailJournal" component={DetailJournal} />
             </Stacks.Navigator>

@@ -3,10 +3,15 @@ import { TouchableOpacity, ScrollView, Alert } from "react-native";
 import styled from "styled-components/native";
 import colors from "../colors";
 import { Ionicons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { DBContext } from "../context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { FlexRow_AlignCenter } from "../journalsStyles";
+import {
+  loadJournals,
+  loadToDos,
+  saveJournals,
+  saveToDos,
+} from "../src/AsyncStorage";
 
 const Container = styled.View`
   flex:1
@@ -111,9 +116,6 @@ const Journal_Btn = styled.TouchableOpacity`
   z-index: 1;
 `;
 
-const TODO_STORAGE_KEY = "@toDos";
-const JOURNAL_STORAGE_KEY = "@contextDB";
-
 export default function Note({ navigation: { navigate } }) {
   const { contextDB, setContextDB } = useContext(DBContext);
   const [todolist, setTodolist] = useState(true);
@@ -130,10 +132,14 @@ export default function Note({ navigation: { navigate } }) {
   const onChangeEditText = (payload) => setEditText(payload);
 
   useEffect(() => {
-    loadToDos();
-    loadJournals();
+    loadToDos(setToDos);
+    loadJournals(setDiaries);
   }, []);
 
+  /**
+   * 일기에서 받은 데이터(contextDB) edit의 boolean 값에 따라
+   * addJournal 또는 editJournal 코드로 향한다
+   */
   useEffect(() => {
     if (Object.keys(contextDB).length > 0) {
       if (Object.values(contextDB)[0].edit === false) {
@@ -145,23 +151,10 @@ export default function Note({ navigation: { navigate } }) {
     } else return;
   }, [contextDB]);
 
-  const saveToDos = async (toSave) => {
-    await AsyncStorage.setItem(TODO_STORAGE_KEY, JSON.stringify(toSave));
-  };
-  const saveJournals = async (toSave) => {
-    await AsyncStorage.setItem(JOURNAL_STORAGE_KEY, JSON.stringify(toSave));
-  };
-
-  const loadToDos = async () => {
-    const toLoad = await AsyncStorage.getItem(TODO_STORAGE_KEY);
-    setToDos(JSON.parse(toLoad));
-  };
-
-  const loadJournals = async () => {
-    const toLoad = await AsyncStorage.getItem(JOURNAL_STORAGE_KEY);
-    setDiaries(JSON.parse(toLoad));
-  };
-
+  /**
+   * 기존에 있던 일기 데이터와 contextDB에서 받은 새 일기 데이터를
+   * 결합하고 저장하는 코드
+   */
   const addJournal = async (newDiary) => {
     const newJournals = {
       ...newDiary,
@@ -172,19 +165,22 @@ export default function Note({ navigation: { navigate } }) {
     await saveJournals(newJournals);
   };
 
-  const addToDo = async () => {
-    if (text === "") {
-      return;
-    }
-    const newToDos = {
-      [Date.now()]: { text, todolist, check, edit },
-      ...toDos,
-    };
-    setToDos(newToDos);
-    await saveToDos(newToDos);
-    setText("");
+  /**
+   * diaries(일기) 배열에서 선택된 일기를 수정하고 저장하는 코드
+   */
+  const editJournal = async (edit) => {
+    const key = Object.keys(edit)[0];
+    const diary = { ...diaries };
+    diary[key] = edit[key];
+    setContextDB({});
+    setDiaries(diary);
+    await saveJournals(diary);
   };
 
+  /**
+   * 일기 리스트에 부여된 아이콘을 길게 누르면 alert 발생
+   * alert에서 수정, 삭제가 가능
+   */
   const deleteJournal = (key) => {
     Alert.alert("", "수정 또는 삭제 하시겠습니까?", [
       { text: "취소" },
@@ -208,6 +204,27 @@ export default function Note({ navigation: { navigate } }) {
     ]);
   };
 
+  /**
+   * 일정탭의 Input에서 받은 데이터가 빈값이 아니라면
+   * 기존에 있던 데이터와 결합하고 저장하는 코드
+   */
+  const addToDo = async () => {
+    if (text === "") {
+      return;
+    }
+    const newToDos = {
+      [Date.now()]: { text, todolist, check, edit },
+      ...toDos,
+    };
+    setToDos(newToDos);
+    await saveToDos(newToDos);
+    setText("");
+  };
+
+  /**
+   * 일정 리스트에 부여된 아이콘을 길게 누르면 alert 발생
+   * alert에서 수정, 삭제가 가능
+   */
   const deleteToDo = (key) => {
     Alert.alert("", "수정 또는 삭제 하시겠습니까?", [
       { text: "취소" },
@@ -230,22 +247,10 @@ export default function Note({ navigation: { navigate } }) {
     ]);
   };
 
-  const editToDo = async (key) => {
-    const newToDos = { ...toDos };
-    newToDos[key].edit = !newToDos[key].edit;
-    setToDos(newToDos);
-    await saveToDos(newToDos);
-  };
-
-  const editJournal = async (edit) => {
-    const key = Object.keys(edit)[0];
-    const diary = { ...diaries };
-    diary[key] = edit[key];
-    setContextDB({});
-    setDiaries(diary);
-    await saveJournals(diary);
-  };
-
+  /**
+   * 수정할 일정 Input에서 받은 데이터가 빈값이 아니라면
+   * 선택된 일정의 데이터값을 변경하고 저장한다
+   */
   const editSubmit = async (key) => {
     if (editText === "") {
       return;
@@ -258,6 +263,19 @@ export default function Note({ navigation: { navigate } }) {
     setEditText("");
   };
 
+  /**
+   * toDos(일정) 배열에서 선택된 일정을 수정하고 저장하는 코드
+   */
+  const editToDo = async (key) => {
+    const newToDos = { ...toDos };
+    newToDos[key].edit = !newToDos[key].edit;
+    setToDos(newToDos);
+    await saveToDos(newToDos);
+  };
+
+  /**
+   * 일정 리스트에서 사용되며, 체크 toggle 코드
+   */
   const isChecked = (key) => {
     const newToDos = { ...toDos };
     newToDos[key].check = !newToDos[key].check;
@@ -275,7 +293,7 @@ export default function Note({ navigation: { navigate } }) {
                 color: todolist ? "white" : colors.pinkColor,
               }}
             >
-              할 일
+              일정
             </Header_text>
           </TouchableOpacity>
           <TouchableOpacity onPress={journal}>
