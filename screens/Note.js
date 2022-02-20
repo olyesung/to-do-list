@@ -335,7 +335,7 @@ export default function Note({ navigation: { navigate } }) {
                     ) : (
                       <Check_box>
                         <Ionicons
-                          name="checkbox-outline"
+                          name="checkmark-sharp"
                           size={20}
                           color={colors.grayColor}
                         />
